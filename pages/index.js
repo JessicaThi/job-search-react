@@ -2,11 +2,19 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 
 export default function Home() {
+  const [cityList, setCityList] = useState([
+    { id: 1, value: "London", isChecked: true },
+    { id: 2, value: "Amsterdam", isChecked: false },
+    { id: 3, value: "New York", isChecked: false },
+    { id: 4, value: "Berlin", isChecked: false },
+  ])
+  const [citySelect, setCitySelect] = useState("London");
   const [job, setJob] = useState("");
 
   useEffect(() => {
+    console.log(citySelect);
     fetch(
-      `/api/hello`,
+      `/api/hello?location=${citySelect}`,
       {
         method: "GET",
       }
@@ -17,7 +25,20 @@ export default function Home() {
         setJob(response)
       })
       .catch(error => console.log(error));
-  }, []);
+  }, [citySelect]);
+
+  const changeCity = (e) => {
+    const newCityList = cityList.map(city => {
+      if (e.target.value == city.value && city.isChecked != true) {
+        city.isChecked = true;
+        setCitySelect(e.target.value);
+      } else {
+        city.isChecked = false;
+      }
+      return city
+    })
+    setCityList(newCityList);
+  };
 
   return (
     <main className="container max-w-screen-xl mx-auto px-5">
@@ -31,7 +52,7 @@ export default function Home() {
       <div className="grid grid-col-1 lg:grid-rows-3 lg:grid-flow-col gap-8 pt-8">
         <aside className="col-span-3 lg:col-span-1 row-span-3">
           <div className="flex items-center">
-            <input type="checkbox" className="form-tick appearance-none h-4 w-4 border border-gray-300 rounded-sm checked:bg-blue-600 checked:border-transparent focus:outline-none" name="full-time" id="full-time" />
+            <input type="checkbox" className="form-tick appearance-none h-4 w-4 border border-gray-300 rounded-sm checked:bg-blue-600 checked:border-transparent checked:border-blue-600 focus:outline-none" name="full-time" id="full-time" />
             <label className="font-medium text-sm text-blue-900 ml-3" for="full-time">Full-time</label>
           </div>
           <div className="flex flex-col pt-7 pb-4">
@@ -39,22 +60,16 @@ export default function Home() {
             <input className="shadow-sm font-roboto font-normal text-xs outline-none p-4 pl-6" type="search" id="location" name="location"
               placeholder="City, state, zip code or country" />
           </div>
-          <div className="flex items-center pt-2 pb-1">
-            <input type="checkbox" className="form-tick appearance-none h-4 w-4 border border-gray-300 rounded-sm checked:bg-blue-600 checked:border-transparent focus:outline-none" name="london" id="london" />
-            <label className="font-medium text-sm text-blue-900 ml-3" for="london">London</label>
-          </div>
-          <div className="flex items-center pt-2 pb-1">
-            <input type="checkbox" className="form-tick appearance-none h-4 w-4 border border-gray-300 rounded-sm checked:bg-blue-600 checked:border-transparent focus:outline-none" name="amsterdam" id="amsterdam" />
-            <label className="font-medium text-sm text-blue-900 ml-3" for="amsterdam">Amsterdam</label>
-          </div>
-          <div className="flex items-center pt-2 pb-1">
-            <input type="checkbox" className="form-tick appearance-none h-4 w-4 border border-gray-300 rounded-sm checked:bg-blue-600 checked:border-transparent focus:outline-none" name="new-york" id="new-york" />
-            <label className="font-medium text-sm text-blue-900 ml-3" for="new-york">New York</label>
-          </div>
-          <div className="flex items-center pt-2 pb-1">
-            <input type="checkbox" className="form-tick appearance-none h-4 w-4 border border-gray-300 rounded-sm checked:bg-blue-600 checked:border-transparent focus:outline-none" name="berlin" id="berlin" />
-            <label className="font-medium text-sm text-blue-900 ml-3" for="berlin">Berlin</label>
-          </div>
+          {
+            cityList.map(city => {
+              return (
+                <div className="flex items-center pt-2 pb-1">
+                  <input checked={city.isChecked} type="checkbox" className="form-tick appearance-none h-4 w-4 border border-gray-300 rounded-sm checked:bg-blue-600 checked:border-transparent checked:border-blue-600 focus:outline-none" onChange={changeCity} value={city.value} id={city.value} />
+                  <label className="font-medium text-sm text-blue-900 ml-3" for={city.value}>{city.value}</label>
+                </div>
+              )
+            })
+          }
         </aside>
 
         <div className="col-span-3 lg:col-span-2">
@@ -79,13 +94,13 @@ export default function Home() {
         </div>
 
         <div className="col-span-3 lg:col-span-2 flex justify-center lg:justify-end">
-          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg></button>
-          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500">1</button>
-          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500">2</button>
-          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500">3</button>
+          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg></button>
+          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white">1</button>
+          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white">2</button>
+          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white">3</button>
           <div className="w-9 h-9 mr-3 flex justify-center items-center"><svg className="w-6 h-6 fill-current text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg></div>
-          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500">10</button>
-          <button className="w-9 h-9 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg></button>
+          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white">10</button>
+          <button className="w-9 h-9 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg></button>
         </div>
       </div>
     </main>
