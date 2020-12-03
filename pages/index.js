@@ -1,6 +1,21 @@
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
 
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function () {
+    var context = this, args = arguments;
+    var later = function () {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};
+
 export default function Home() {
   const [cityList, setCityList] = useState([
     { id: 1, value: "London", isChecked: true },
@@ -12,7 +27,6 @@ export default function Home() {
   const [job, setJob] = useState("");
 
   useEffect(() => {
-    console.log(citySelect);
     fetch(
       `/api/hello?location=${citySelect}`,
       {
@@ -40,6 +54,16 @@ export default function Home() {
     setCityList(newCityList);
   };
 
+  const changeLocation = (e) => {
+    setCitySelect(e.target.value);
+    const newCityList = cityList.map(city => {
+      city.isChecked = false;
+      return city
+    })
+    setCityList(newCityList);
+  }
+  const debouncedChangeLocation = debounce(changeLocation, 500)
+
   return (
     <main className="container max-w-screen-xl mx-auto px-5">
       <h1 className="text-2xl	font-bold py-8">Github <span className="font-light">Jobs</span></h1>
@@ -51,14 +75,11 @@ export default function Home() {
       </div>
       <div className="grid grid-col-1 lg:grid-rows-3 lg:grid-flow-col gap-8 pt-8">
         <aside className="col-span-3 lg:col-span-1 row-span-3">
-          <div className="flex items-center">
-            <input type="checkbox" className="form-tick appearance-none h-4 w-4 border border-gray-300 rounded-sm checked:bg-blue-600 checked:border-transparent checked:border-blue-600 focus:outline-none" name="full-time" id="full-time" />
-            <label className="font-medium text-sm text-blue-900 ml-3" for="full-time">Full-time</label>
-          </div>
           <div className="flex flex-col pt-7 pb-4">
             <label for="location" className="font-bold uppercase text-sm text-gray-400 pb-3">Location</label>
             <input className="shadow-sm font-roboto font-normal text-xs outline-none p-4 pl-6" type="search" id="location" name="location"
-              placeholder="City, state, zip code or country" />
+              placeholder="City, state, zip code or country"
+              onChange={debouncedChangeLocation} />
           </div>
           {
             cityList.map(city => {

@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import Link from 'next/link';
 
 export default function offer() {
   return (
@@ -6,7 +7,10 @@ export default function offer() {
       <h1 className="text-2xl	font-bold py-8">Github <span className="font-light">Jobs</span></h1>
       <div className="md:flex">
         <aside className="md:w-1/4 md:pr-20 pb-6 md:pb-0">
-          <a href="#" className="flex items-center font-poppins font-medium text-sm text-blue-500"><svg className="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" /></svg>Back to search</a>
+          <Link href="/">
+            <a className="flex items-center font-poppins font-medium text-sm text-blue-500"><svg className="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" /></svg>Back to search
+            </a>
+          </Link>
           <p className="font-bold uppercase text-sm text-gray-400 pt-9 pb-4">How to Apply</p>
           <p className="font-poppins font-medium text-sm text-blue-900">Please email a copy of your resume and online portfolio to wes@kasisto.com & CC eric@kasisto.com</p>
         </aside>
