@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
+import Link from 'next/link'
+
 
 function debounce(func, wait, immediate) {
   var timeout;
@@ -25,6 +27,9 @@ export default function Home() {
   ])
   const [citySelect, setCitySelect] = useState("London");
   const [job, setJob] = useState("");
+  const [inputCity, setInputCity] = useState("");
+  const [searchDescription, setSearchDescription] = useState("");
+  const [changeDescription, setChangeDescription] = useState("");
 
   useEffect(() => {
     fetch(
@@ -41,11 +46,27 @@ export default function Home() {
       .catch(error => console.log(error));
   }, [citySelect]);
 
+  useEffect(() => {
+    fetch(
+      `/api/description?description=${changeDescription}`,
+      {
+        method: "GET",
+      }
+    )
+      .then(res => res.json())
+      .then(response => {
+        console.log(response)
+        setJob(response)
+      })
+      .catch(error => console.log(error));
+  }, [changeDescription]);
+
   const changeCity = (e) => {
     const newCityList = cityList.map(city => {
       if (e.target.value == city.value && city.isChecked != true) {
         city.isChecked = true;
         setCitySelect(e.target.value);
+        setInputCity('');
       } else {
         city.isChecked = false;
       }
@@ -64,13 +85,23 @@ export default function Home() {
   }
   const debouncedChangeLocation = debounce(changeLocation, 500)
 
+  const onChangeDescription = (e) => {
+    setSearchDescription(e.target.value)
+    const newCityList = cityList.map(city => {
+      city.isChecked = false;
+      return city
+    })
+    setCityList(newCityList);
+    setInputCity('');
+  }
+
   return (
     <main className="container max-w-screen-xl mx-auto px-5">
       <h1 className="text-2xl	font-bold py-8">Github <span className="font-light">Jobs</span></h1>
       <div className="block-search rounded-lg py-6 px-5 flex justify-center items-center">
         <div className="w-full md:w-11/12 lg:w-9/12 flex justify-between box-search bg-white rounded p-1">
-          <input className="w-full font-roboto font-normal text-xs truncate outline-none mx-4" type="text" placeholder="Title, companies, expertise or benefits" />
-          <button className="bg-blue-500 font-roboto text-white text-base font-medium py-3 px-10 rounded">Search</button>
+          <input onChange={onChangeDescription} value={searchDescription} className="w-full font-roboto font-normal text-xs truncate outline-none mx-4" type="text" placeholder="Title, companies, expertise or benefits" />
+          <button onClick={() => setChangeDescription(searchDescription)} className="bg-blue-500 font-roboto text-white text-base font-medium py-3 px-10 rounded">Search</button>
         </div>
       </div>
       <div className="grid grid-col-1 lg:grid-rows-3 lg:grid-flow-col gap-8 pt-8">
@@ -79,7 +110,9 @@ export default function Home() {
             <label for="location" className="font-bold uppercase text-sm text-gray-400 pb-3">Location</label>
             <input className="shadow-sm font-roboto font-normal text-xs outline-none p-4 pl-6" type="search" id="location" name="location"
               placeholder="City, state, zip code or country"
-              onChange={debouncedChangeLocation} />
+              value={inputCity}
+              onChange={(e) => { setInputCity(e.target.value); setSearchDescription(''); debouncedChangeLocation(e) }}
+            />
           </div>
           {
             cityList.map(city => {
@@ -95,22 +128,24 @@ export default function Home() {
 
         <div className="col-span-3 lg:col-span-2">
           {job ? job.slice(0, 5).map(job => (
-            <div className="flex justify-between bg-white p-2 mb-8 rounded shadow-sm">
-              <div className="w-24 h-24 mr-3 flex justify-center items-center rounded">
-                <img src={job.company_logo} />
-              </div>
-              <div className="flex flex-1 flex-col sm:flex-row">
-                <div className="flex flex-1 flex-col items-start">
-                  <p className="text-xs font-roboto font-bold text-blue-900">{job.company}</p>
-                  <p className="text-lg font-roboto font-normal text-blue-900 py-2">{job.title}</p>
-                  <span className="text-xs font-roboto font-bold text-blue-900 border border-blue-900 rounded py-1 px-2">{job.type}</span>
+            <Link href={`/offer/${job.id}`}>
+              <a className="flex justify-between bg-white p-2 mb-8 rounded shadow-sm">
+                <div className="w-24 h-24 mr-3 flex justify-center items-center rounded">
+                  <img src={job.company_logo} />
                 </div>
-                <div className="flex items-end mt-4 sm:mb-2 mr-1">
-                  <span className="flex items-center font-roboto font-medium text-xs text-gray-400 mr-8"><svg className="w-6 h-6 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" /></svg>{job.location}</span>
-                  <span className="flex items-center font-roboto font-medium text-xs text-gray-400"><svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>5 days ago</span>
+                <div className="flex flex-1 flex-col sm:flex-row">
+                  <div className="flex flex-1 flex-col items-start">
+                    <p className="text-xs font-roboto font-bold text-blue-900">{job.company}</p>
+                    <p className="text-lg font-roboto font-normal text-blue-900 py-2">{job.title}</p>
+                    <span className="text-xs font-roboto font-bold text-blue-900 border border-blue-900 rounded py-1 px-2">{job.type}</span>
+                  </div>
+                  <div className="flex items-end mt-4 sm:mb-2 mr-1">
+                    <span className="flex items-center font-roboto font-medium text-xs text-gray-400 mr-8"><svg className="w-6 h-6 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" /></svg>{job.location}</span>
+                    <span className="flex items-center font-roboto font-medium text-xs text-gray-400"><svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>5 days ago</span>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </a>
+            </Link>
           )) : ''}
         </div>
 
