@@ -30,6 +30,7 @@ export default function Home() {
   const [inputCity, setInputCity] = useState("");
   const [searchDescription, setSearchDescription] = useState("");
   const [changeDescription, setChangeDescription] = useState("");
+  const [dateJob, setDateJob] = useState("");
 
   useEffect(() => {
     fetch(
@@ -95,12 +96,26 @@ export default function Home() {
     setInputCity('');
   }
 
+  const getDateJob = ((job) => {
+    let dt1 = new Date(job.created_at);
+    let dt2 = new Date().getTime();
+    let diff = (dt2 - dt1.getTime()) / 1000;
+    diff /= (60 * 60 * 24);
+    diff = Math.abs(Math.round(diff))
+    if (diff == 0) {
+      return "Today"
+    } else {
+      return diff + "day(s) ago";
+    }
+  })
+
   return (
     <main className="container max-w-screen-xl mx-auto px-5">
       <h1 className="text-2xl	font-bold py-8">Github <span className="font-light">Jobs</span></h1>
       <div className="block-search rounded-lg py-6 px-5 flex justify-center items-center">
-        <div className="w-full md:w-11/12 lg:w-9/12 flex justify-between box-search bg-white rounded p-1">
-          <input onChange={onChangeDescription} value={searchDescription} className="w-full font-roboto font-normal text-xs truncate outline-none mx-4" type="text" placeholder="Title, companies, expertise or benefits" />
+        <div className="w-full md:w-11/12 lg:w-9/12 flex justify-between items-center box-search bg-white rounded p-1 focus-within:text-gray-600">
+          <svg className="w-6 h-6 ml-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+          <input onChange={onChangeDescription} value={searchDescription} className="w-full font-roboto font-normal text-xs truncate outline-none ml-2 mr-4" type="text" placeholder="Title, companies, expertise or benefits" />
           <button onClick={() => setChangeDescription(searchDescription)} className="bg-blue-500 font-roboto text-white text-base font-medium py-3 px-10 rounded">Search</button>
         </div>
       </div>
@@ -108,17 +123,20 @@ export default function Home() {
         <aside className="col-span-3 lg:col-span-1 row-span-3">
           <div className="flex flex-col pt-7 pb-4">
             <label for="location" className="font-bold uppercase text-sm text-gray-400 pb-3">Location</label>
-            <input className="shadow-sm font-roboto font-normal text-xs outline-none p-4 pl-6" type="search" id="location" name="location"
-              placeholder="City, state, zip code or country"
-              value={inputCity}
-              onChange={(e) => { setInputCity(e.target.value); setSearchDescription(''); debouncedChangeLocation(e) }}
-            />
+            <div className="flex bg-white text-gray-400 focus:text-gray-900 shadow-sm rounded-sm font-roboto font-normal text-xs truncate p-3">
+              <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" /></svg>
+              <input className="ml-2 flex-1 placeholder-gray-400 text-blue-900 outline-none" type="search" id="location" name="location"
+                placeholder="City, state, zip code or country"
+                value={inputCity}
+                onChange={(e) => { setInputCity(e.target.value); setSearchDescription(''); debouncedChangeLocation(e) }}
+              />
+            </div>
           </div>
           {
             cityList.map(city => {
               return (
                 <div className="flex items-center pt-2 pb-1">
-                  <input checked={city.isChecked} type="checkbox" className="form-tick appearance-none h-4 w-4 border border-gray-300 rounded-sm checked:bg-blue-600 checked:border-transparent checked:border-blue-600 focus:outline-none" onChange={changeCity} value={city.value} id={city.value} />
+                  <input checked={city.isChecked} type="checkbox" className="form-tick appearance-none h-4 w-4 border border-gray-300 rounded-sm form-checkbox text-blue-600 checked:border-transparent checked:border-blue-600 focus:outline-none" onChange={changeCity} value={city.value} id={city.value} />
                   <label className="font-medium text-sm text-blue-900 ml-3" for={city.value}>{city.value}</label>
                 </div>
               )
@@ -141,7 +159,8 @@ export default function Home() {
                   </div>
                   <div className="flex items-end mt-4 sm:mb-2 mr-1">
                     <span className="flex items-center font-roboto font-medium text-xs text-gray-400 mr-8"><svg className="w-6 h-6 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" /></svg>{job.location}</span>
-                    <span className="flex items-center font-roboto font-medium text-xs text-gray-400"><svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>5 days ago</span>
+                    <span className="flex items-center font-roboto font-medium text-xs text-gray-400"><svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>{getDateJob(job)}
+                    </span>
                   </div>
                 </div>
               </a>
