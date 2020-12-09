@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import Jobs from "./components/Jobs"
+import Pagination from './components/Pagination';
 
 
 function debounce(func, wait, immediate) {
@@ -32,10 +33,10 @@ export default function Home() {
   const [searchDescription, setSearchDescription] = useState("");
   const [changeDescription, setChangeDescription] = useState("");
 
-  //const [posts, setPosts] = useState([]);
-  //const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [jobsPerPage, setJobsPerPage] = useState(5);
+  const [jobsPerPage] = useState(5);
+  const [mounted, setMounted] = useState(false)
+
 
   useEffect(() => {
     fetch(
@@ -53,26 +54,34 @@ export default function Home() {
   }, [citySelect]);
 
   useEffect(() => {
-    fetch(
-      `/api/description?description=${changeDescription}`,
-      {
-        method: "GET",
-      }
-    )
-      .then(res => res.json())
-      .then(response => {
-        console.log(response)
-        setJobs(response)
-      })
-      .catch(error => console.log(error));
+    if (mounted) {
+      fetch(
+        `/api/description?description=${changeDescription}`,
+        {
+          method: "GET",
+        }
+      )
+        .then(res => res.json())
+        .then(response => {
+          console.log(response)
+          setJobs(response)
+        })
+        .catch(error => console.log(error));
+    }
   }, [changeDescription]);
 
+  useEffect(() => {
+    setMounted(true);
+  }, [])
+
+  //Filter city with checkbox
   const changeCity = (e) => {
     const newCityList = cityList.map(city => {
       if (e.target.value == city.value && city.isChecked != true) {
         city.isChecked = true;
         setCitySelect(e.target.value);
         setInputCity('');
+        setCurrentPage(1);
       } else {
         city.isChecked = false;
       }
@@ -81,20 +90,24 @@ export default function Home() {
     setCityList(newCityList);
   };
 
+  //Input search location, on top filter city
   const changeLocation = (e) => {
     setCitySelect(e.target.value);
     const newCityList = cityList.map(city => {
       city.isChecked = false;
+      setCurrentPage(1);
       return city
     })
     setCityList(newCityList);
   }
   const debouncedChangeLocation = debounce(changeLocation, 500)
 
+  //Input search descriptio, like title, job, company
   const onChangeDescription = (e) => {
     setSearchDescription(e.target.value)
     const newCityList = cityList.map(city => {
       city.isChecked = false;
+      setCurrentPage(1);
       return city
     })
     setCityList(newCityList);
@@ -105,6 +118,9 @@ export default function Home() {
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
   const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
+
+  //Change Page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <main className="container max-w-screen-xl mx-auto px-5">
@@ -141,17 +157,8 @@ export default function Home() {
           }
         </aside>
 
-        <Jobs jobs={jobs} />
-
-        <div className="col-span-3 lg:col-span-2 flex justify-center lg:justify-end">
-          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg></button>
-          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white">1</button>
-          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white">2</button>
-          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white">3</button>
-          <div className="w-9 h-9 mr-3 flex justify-center items-center"><svg className="w-6 h-6 fill-current text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg></div>
-          <button className="w-9 h-9 mr-3 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white">10</button>
-          <button className="w-9 h-9 flex justify-center items-center font-roboto font-normal text-xs text-gray-400 border border-gray-400 rounded hover:text-blue-500 hover:border-blue-500 active:bg-blue-500 active:text-white"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg></button>
-        </div>
+        <Jobs jobs={currentJobs} />
+        <Pagination jobsPerPage={jobsPerPage} totalJobs={jobs.length} paginate={paginate} currentPage={currentPage} />
       </div>
     </main>
   )

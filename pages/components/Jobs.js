@@ -11,13 +11,13 @@ const Jobs = ({jobs}) => {
     if (diff == 0) {
       return "Today"
     } else {
-      return diff + "day(s) ago";
+      return diff + " day(s) ago";
     }
   })
 
   return (
     <div className="col-span-3 lg:col-span-2">
-      {jobs ? jobs.slice(0, 5).map(job => (
+      {jobs ? jobs.map(job => (
         <Link href={`/offer/${job.id}`}>
           <a className="flex justify-between bg-white p-2 mb-8 rounded shadow-sm">
             <div className="w-24 h-24 mr-3 flex justify-center items-center rounded">
