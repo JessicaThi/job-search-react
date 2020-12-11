@@ -11,7 +11,7 @@ const Pagination = ({ jobsPerPage, totalJobs, paginate, currentPage }) => {
   const lastPages = [currentPage - 2, currentPage - 1, currentPage];
 
   return (
-    <nav className="col-span-3 lg:col-span-2">
+    <nav className="col-span-1 lg:col-span-3">
       <ul className="flex justify-center lg:justify-end">
         {/* bouton page PRECEDENTE */}
         {(currentPage != 1) ?
