@@ -1,3 +1,14 @@
+## GitHub Jobs
+This is a project from [Dev Challenges](https://devchallenges.io/challenges/TtUjDt19eIHxNQ4n5jps). 
+You will learn how to make :
+- calls API with [GitHub Jobs API]( https://jobs.github.com/api)
+- filter data
+- pagination
+- handle params url
+
+I decided to use React & Tailwind.css to made this project. Feedbacks are welcome ! 😊
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
@@ -28,3 +39,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/import?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Special thanks to [hyiuen](https://github.com/hyiuen) for the mentoring 🌟
