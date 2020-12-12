@@ -1,11 +1,11 @@
 module.exports = {
-  purge: [],
-  darkMode: false, // or 'media' or 'class'
+  purge: ['./pages/**/*.js', './components/**/*.js'],
+  darkMode: false,
   theme: {
     fontFamily: {
       'poppins': ['Poppins', 'sans-serif'],
       'roboto': ['Roboto', 'sans-serif'],
-     }
+    }
   },
   variants: {
     extend: {
