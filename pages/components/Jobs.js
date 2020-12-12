@@ -18,7 +18,7 @@ const Jobs = ({ jobs }) => {
   return (
     <div className="col-span-1 lg:col-span-2 lg:col-start-2 grid gap-8">
       {jobs ? jobs.map(job => (
-        <Link href={`/offer/${job.id}`}>
+        <Link key={job.id} href={`/offer/${job.id}`}>
           <a className="flex justify-between bg-white p-2 rounded shadow-sm">
             <div className="w-24 h-24 mr-3 flex justify-center items-center rounded">
               <img src={job.company_logo} />
