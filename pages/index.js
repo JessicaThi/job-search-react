@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
-import Link from 'next/link'
 import Jobs from "./components/Jobs"
 import Pagination from './components/Pagination';
-
+import { useRouter } from "next/router"
 
 function debounce(func, wait, immediate) {
   var timeout;
@@ -21,36 +20,41 @@ function debounce(func, wait, immediate) {
 };
 
 export default function Home() {
+  const router = useRouter();
+  const searchParams = new URLSearchParams(router.asPath.split('?')[1]);
+  const defaultCity = searchParams.get('city') || "Amsterdam";
+
   const [cityList, setCityList] = useState([
-    { id: 1, value: "London", isChecked: true },
-    { id: 2, value: "Amsterdam", isChecked: false },
-    { id: 3, value: "New York", isChecked: false },
-    { id: 4, value: "Berlin", isChecked: false },
+    { id: 1, value: "London", isChecked: defaultCity == "London" },
+    { id: 2, value: "Amsterdam", isChecked: defaultCity == "Amsterdam" },
+    { id: 3, value: "New York", isChecked: defaultCity == "New York" },
+    { id: 4, value: "Berlin", isChecked: defaultCity == "Berlin" },
   ])
-  const [citySelect, setCitySelect] = useState("London");
+  const [citySelect, setCitySelect] = useState(defaultCity);
   const [jobs, setJobs] = useState("");
   const [inputCity, setInputCity] = useState("");
   const [searchDescription, setSearchDescription] = useState("");
   const [changeDescription, setChangeDescription] = useState("");
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(searchParams.get('page') || 1);
   const [jobsPerPage] = useState(5);
   const [mounted, setMounted] = useState(false)
 
-
   useEffect(() => {
-    fetch(
-      `/api/hello?location=${citySelect}`,
-      {
-        method: "GET",
-      }
-    )
-      .then(res => res.json())
-      .then(response => {
-        console.log(response)
-        setJobs(response)
-      })
-      .catch(error => console.log(error));
+    if (citySelect) {
+      fetch(
+        `/api/hello?location=${citySelect}`,
+        {
+          method: "GET",
+        }
+      )
+        .then(res => res.json())
+        .then(response => {
+          // console.log(response)
+          setJobs(response)
+        })
+        .catch(error => console.log(error));
+    }
   }, [citySelect]);
 
   useEffect(() => {
@@ -63,7 +67,7 @@ export default function Home() {
       )
         .then(res => res.json())
         .then(response => {
-          console.log(response)
+          // console.log(response)
           setJobs(response)
         })
         .catch(error => console.log(error));
@@ -102,7 +106,7 @@ export default function Home() {
   }
   const debouncedChangeLocation = debounce(changeLocation, 500)
 
-  //Input search descriptio, like title, job, company
+  //Input search description, like title, job, company
   const onChangeDescription = (e) => {
     setSearchDescription(e.target.value)
     const newCityList = cityList.map(city => {
@@ -120,7 +124,18 @@ export default function Home() {
   const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
 
   //Change Page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  useEffect(() => {
+    if (mounted) {
+      const searchParams = new URLSearchParams();
+      searchParams.append('page', currentPage);
+      searchParams.append('city', citySelect);
+      router.push(`?${searchParams.toString()}`)
+    }
+  }, [currentPage, citySelect])
 
   return (
     <main className="container max-w-screen-xl mx-auto px-5">
